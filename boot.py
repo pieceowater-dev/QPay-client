@@ -1,41 +1,21 @@
 # boot.py -- run on boot-up
-import network
+# import webrepl_setup
+
+WIFI_NAME = 'Pieceowater'
+WIFI_PASS = 'Idontwanttosettheworldonfire'
 
 
-WIFI_NAME = "Safe Level of Radiation"
-WIFI_PASS = "Idontwanttosettheworldonfire"
-
-WLAN_INSTANCE = network.WLAN(network.STA_IF)
-
-def connect_to_wifi(ssid, password):
-    print(f"WiFi active ({WLAN_INSTANCE.active()}) and is con ({WLAN_INSTANCE.isconnected()})")
-    try:
-        WLAN_INSTANCE.connect()
-        if not WLAN_INSTANCE.isconnected():
-            print(f"WiFi status ({WLAN_INSTANCE.status})")
-            print(f"Connecting to WiFi ({ssid})...")
-            WLAN_INSTANCE.active(True)
-            print(f"connecting to {ssid}, {password}")
-            WLAN_INSTANCE.connect(ssid, password)
-            print(f"mac: {WLAN_INSTANCE.config('mac')}")
-
-            retries = 0
-            while not WLAN_INSTANCE.isconnected():
-                retries += 1
-                print(f"Attempt: {retries}, {WLAN_INSTANCE.ifconfig()}")
-                if retries > 3:  
-                    print("Failed to connect to WiFi.")
-                    return False
-            print("Connected to WiFi:", ssid)
-            return True
-        else:
-            print("Already connected to WiFi.")
-            return True
-    except Exception as e:
-        WLAN_INSTANCE.disconnect()
-        print(e)
-        return False
-
+def wifi_connect():
+    import network
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    # print(wlan.scan())
+    if not wlan.isconnected():
+        print('connecting to network...')
+        wlan.connect(WIFI_NAME, WIFI_PASS)
+        while not wlan.isconnected():
+            pass
+    print('network config:', wlan.ifconfig())
 
 def get_storage_info():
     statvfs = os.statvfs('/')
@@ -58,17 +38,9 @@ def init():
     print("Total Storage: {:.2f} MB".format(total_storage))
     print("Free Storage: {:.2f} MB".format(free_storage))
     print(">>>>>>>>>>>>>>>>>>>>>>")
+    
 
-
-    #ssid = 'OnePlus vIt'
-    #password = 'goodgames'
-    # ssid = 'mid - iphone'
-    # password = 'mid12345'
-    ssid = WIFI_NAME
-    password = WIFI_PASS
-
-    if not connect_to_wifi(ssid, password):
-        return
+    wifi_connect()
 
     print("BOOTED UP!")
 

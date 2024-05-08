@@ -1,8 +1,3 @@
-# import os
-# import gc
-# import machine
-# import network
-
 import urequests
 # from socketIO_client import SocketIO, LoggingNamespace
 
