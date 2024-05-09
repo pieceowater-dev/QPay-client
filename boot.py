@@ -4,6 +4,9 @@
 WIFI_NAME = 'Pieceowater'
 WIFI_PASS = 'Idontwanttosettheworldonfire'
 
+DEVICE_KEY = 'HelloWorld123'
+BACKEND_HOST = 'api.grands-pay.com'
+
 
 def wifi_connect():
     import network
@@ -18,12 +21,14 @@ def wifi_connect():
     print('network config:', wlan.ifconfig())
 
 def get_storage_info():
+    import os
     statvfs = os.statvfs('/')
     total_storage = statvfs[0] * statvfs[2] / (1024 * 1024) 
     free_storage = statvfs[0] * statvfs[3] / (1024 * 1024)  
     return total_storage, free_storage
 
 def get_ram_info():
+    import gc
     ram_size = gc.mem_free() / (1024 * 1024)
     return ram_size
 

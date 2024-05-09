@@ -1,40 +1,44 @@
-import urequests
-# from socketIO_client import SocketIO, LoggingNamespace
+import boot
+import usocket as socket
+import time
 
+WEBSOCKET_HOST = f"{boot.BACKEND_HOST}"
 
-
-def fetch_data(url):
+def websocket_client():
     try:
-        response = urequests.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            response.close()
-            return data
-        else:
-            print("Failed to fetch data. Status code:", response.status_code)
-            response.close()
-            return None
+        ws = socket.socket()
+
+        print(WEBSOCKET_HOST)
+
+        addr_info = socket.getaddrinfo(WEBSOCKET_HOST, 443)
+        print("Address info:", addr_info)
+        
+        addr = addr_info[0][-1]
+        print("Connecting to:", addr)
+        
+        ws.connect(addr)
+        print("WebSocket connected")
+
+        ws.send(b"ping")
+        print(f"Sent 'ping' message to {WEBSOCKET_HOST}")
+
+
+        while True:
+            data = ws.recv(1024)
+            if not data:
+                break
+            
+            if b"ping" in data:
+                print("Received 'ping' event")
+
+        ws.close()
+        print("WebSocket connection closed")
+
+
     except Exception as e:
-        print("Error fetching data:", e)
-        return None
+        print("WebSocket error:", e)
 
-# def on_bbb_response(*args):
-        # print('on_bbb_response', args)
+        if ws:
+            ws.close()
 
-# def socketIo():
-#     socketIO = SocketIO(
-#         'localhost', 8000,
-#         params={"deviceId": "customClientId"},
-#         headers={'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE0NzMzMjgyLCJleHAiOjE3MTQ3MzY4ODJ9.FwTsvSoxNFyJkGTza1Sgdx5mhetgqjWmF9Ts9C_6C0E'}
-#     )
-#     socketIO.emit('subscribe', {"deviceId": "customClientId"}, on_bbb_response)
-#     socketIO.wait_for_callbacks(seconds=1)
-
-def init():
-    url = 'https://pieceowater.github.io/resume/src/data.json'
-    data = fetch_data(url)
-    if data:
-        print("\nData from JSON file:")
-        print(data)
-
-init()
+websocket_client()
