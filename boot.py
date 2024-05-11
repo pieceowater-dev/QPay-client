@@ -1,6 +1,3 @@
-# boot.py -- run on boot-up
-# import webrepl_setup
-
 WIFI_NAME = 'Pieceowater'
 WIFI_PASS = 'Idontwanttosettheworldonfire'
 
