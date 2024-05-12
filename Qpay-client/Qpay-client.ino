@@ -1,33 +1,6 @@
-// #include <WiFi.h>
-
-
-// const char* ssid = "Pieceowater";
-// const char* password = "Idontwanttosettheworldonfire";
-// const char* webSocketServer = "api.grands-pay.com";
-// const int webSocketPort = 443;
-
-// WiFiClient client;
-
-// void setup() {
-//     Serial.begin(115200);
-//     delay(1000);
-
-//     WiFi.begin(ssid, password);
-
-//     while (WiFi.status() != WL_CONNECTED) {
-//         Serial.println("Connecting to WiFi...");
-//         delay(1000);
-//     }
-
-//     Serial.println("Connected to WiFi");
-// }
-
-// void loop() {
-// }
-
 /****************************************************************************************************************************
-  ESP32_WebSocketClientSSL.ino
-  For ESP32
+  Generic_WebSocketClientSocketIO_WiFiNINA.ino
+  For Generic boards using WiFiNINA Shield/Module
 
   Based on and modified from WebSockets libarary https://github.com/Links2004/arduinoWebSockets
   to support other boards such as  SAMD21, SAMD51, Adafruit's nRF52 boards, etc.
@@ -35,88 +8,107 @@
   Built by Khoi Hoang https://github.com/khoih-prog/WebSockets_Generic
   Licensed under MIT license
 
-  Originally Created on: 24.05.2015
+  Created on: 06.06.2016
   Original Author: Markus Sattler
-*****************************************************************************************************************************/
+ *****************************************************************************************************************************/
 
 #if !defined(ESP32)
   #error This code is intended to run only on the ESP32 boards ! Please check your Tools->Board setting.
 #endif
 
-#define _WEBSOCKETS_LOGLEVEL_     2
+#define _WEBSOCKETS_LOGLEVEL_     4
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 
+#include <ArduinoJson.h>
+
 #include <WebSocketsClient_Generic.h>
+#include <SocketIOclient_Generic.h>
 
-WiFiMulti WiFiMulti;
-WebSocketsClient webSocket;
+WiFiMulti       WiFiMulti;
+SocketIOclient  socketIO;
 
-// Deprecated echo.websocket.org to be replaced
-#define WS_SERVER           "wss://api.grands-pay.com"
-#define SSL_PORT            443
+// Select the IP address according to your local network
+IPAddress clientIP(192, 168, 2, 232);
 
-void hexdump(const void *mem, const uint32_t& len, const uint8_t& cols = 16)
-{
-  const uint8_t* src = (const uint8_t*) mem;
+// Select the IP address according to your local network
+// IPAddress serverIP(16, 171, 58, 227);
+char serverHost[] = "api.grands-pay.com"; 
 
-  Serial.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+uint16_t  serverPort = 443;
 
-  for (uint32_t i = 0; i < len; i++)
-  {
-    if (i % cols == 0)
-    {
-      Serial.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
-    }
+int status = WL_IDLE_STATUS;
 
-    Serial.printf("%02X ", *src);
-    src++;
-  }
+///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 
-  Serial.printf("\n");
-}
+char ssid[] = "Pieceowater";        // your network SSID (name)
+char pass[] = "Idontwanttosettheworldonfire";         // your network password (use for WPA, or use as key for WEP), length must be 8+
 
-void webSocketEvent(const WStype_t& type, uint8_t * payload, const size_t& length)
+void socketIOEvent(const socketIOmessageType_t& type, uint8_t * payload, const size_t& length)
 {
   switch (type)
   {
-    case WStype_DISCONNECTED:
-      Serial.printf("[WSc] Disconnected!\n");
+    case sIOtype_DISCONNECT:
+      Serial.println("[IOc] Disconnected");
 
       break;
 
-    case WStype_CONNECTED:
-      Serial.printf("[WSc] Connected to url: %s\n", payload);
+    case sIOtype_CONNECT:
+      Serial.print("[IOc] Connected to url: ");
+      Serial.println((char*) payload);
 
-      // send message to server when Connected
-      webSocket.sendTXT("Connected");
-
-      break;
-
-    case WStype_TEXT:
-      Serial.printf("[WSc] get text: %s\n", payload);
-
-      // send message to server
-      webSocket.sendTXT("message here");
+      // join default namespace (no auto join in Socket.IO V3)
+      socketIO.send(sIOtype_CONNECT, "/");
 
       break;
 
-    case WStype_BIN:
-      Serial.printf("[WSc] get binary length: %u\n", length);
-      hexdump(payload, length);
-
-      // send data to server
-      webSocket.sendBIN(payload, length);
+    case sIOtype_EVENT:
+      Serial.print("[IOc] Get event: ");
+      Serial.println((char*) payload);
 
       break;
 
-    case WStype_ERROR:
-    case WStype_FRAGMENT_TEXT_START:
-    case WStype_FRAGMENT_BIN_START:
-    case WStype_FRAGMENT:
-    case WStype_FRAGMENT_FIN:
+    case sIOtype_ACK:
+      Serial.print("[IOc] Get ack: ");
+      Serial.println(length);
+
+      //hexdump(payload, length);
+
+      break;
+
+    case sIOtype_ERROR:
+      Serial.print("[IOc] Get error: ");
+      Serial.println(length);
+
+      //hexdump(payload, length);
+
+      break;
+
+    case sIOtype_BINARY_EVENT:
+      Serial.print("[IOc] Get binary: ");
+      Serial.println(length);
+
+      //hexdump(payload, length);
+
+      break;
+
+    case sIOtype_BINARY_ACK:
+      Serial.print("[IOc] Get binary ack: ");
+      Serial.println(length);
+
+      //hexdump(payload, length);
+
+      break;
+
+    case sIOtype_PING:
+      Serial.println("[IOc] Get PING");
+
+      break;
+
+    case sIOtype_PONG:
+      Serial.println("[IOc] Get PONG");
 
       break;
 
@@ -125,28 +117,46 @@ void webSocketEvent(const WStype_t& type, uint8_t * payload, const size_t& lengt
   }
 }
 
+void printWifiStatus()
+{
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your board's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("WebSockets Client IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}
+
 void setup()
 {
-  // Serial.begin(921600);
   Serial.begin(115200);
 
   while (!Serial);
 
   delay(200);
 
-  Serial.print("\nStarting ESP32_WebSocketClientSSL on ");
+  Serial.print("\nStart ESP32_WebSocketClientSocketIO on ");
   Serial.println(ARDUINO_BOARD);
   Serial.println(WEBSOCKETS_GENERIC_VERSION);
 
-  //Serial.setDebugOutput(true);
+  WiFiMulti.addAP(ssid, pass);
 
-  WiFiMulti.addAP("Pieceowater", "Idontwanttosettheworldonfire");
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
 
   //WiFi.disconnect();
   while (WiFiMulti.run() != WL_CONNECTED)
   {
     Serial.print(".");
-    delay(100);
+    delay(500);
   }
 
   Serial.println();
@@ -156,18 +166,57 @@ void setup()
   Serial.println(WiFi.localIP());
 
   // server address, port and URL
-  Serial.print("Connecting to WebSockets Server @ ");
-  Serial.println(WS_SERVER);
+  Serial.print("Connecting to WebSockets Server @ IP address: ");
+  Serial.print(serverHost);
+  Serial.print(", port: ");
+  Serial.println(serverPort);
 
-  webSocket.beginSSL(WS_SERVER, SSL_PORT);
-  webSocket.onEvent(webSocketEvent);
+  // setReconnectInterval to 10s, new from v2.5.1 to avoid flooding server. Default is 0.5s
+  socketIO.setReconnectInterval(10000);
+
+  socketIO.setExtraHeaders("Authorization: 1234567890");
 
   // server address, port and URL
-  Serial.print("Connected to WebSockets Server @ ");
-  Serial.println(WS_SERVER);
+  // void begin(IPAddress host, uint16_t port, String url = "/socket.io/?EIO=4", String protocol = "arduino");
+  // To use default EIO=4 from v2.5.1
+  socketIO.begin(serverHost, serverPort);
+
+  // event handler
+  socketIO.onEvent(socketIOEvent);
 }
+
+unsigned long messageTimestamp = 0;
 
 void loop()
 {
-  webSocket.loop();
+  socketIO.loop();
+
+  uint64_t now = millis();
+
+  if (now - messageTimestamp > 30000)
+  {
+    messageTimestamp = now;
+
+    // creat JSON message for Socket.IO (event)
+    DynamicJsonDocument doc(1024);
+    JsonArray array = doc.to<JsonArray>();
+
+    // add evnet name
+    // Hint: socket.on('event_name', ....
+    array.add("event_name");
+
+    // add payload (parameters) for the event
+    JsonObject param1 = array.createNestedObject();
+    param1["now"]     = (uint32_t) now;
+
+    // JSON to String (serializion)
+    String output;
+    serializeJson(doc, output);
+
+    // Send event
+    socketIO.sendEVENT(output);
+
+    // Print JSON for debugging
+    Serial.println(output);
+  }
 }
