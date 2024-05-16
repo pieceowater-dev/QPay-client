@@ -17,10 +17,6 @@ WiFiMulti       WiFiMulti;
 SocketIOclient  socketIO;
 
 // Select the IP address according to your local network
-// IPAddress clientIP(192, 168, 2, 232);
-IPAddress clientIP(192, 168, 0, 13);
-
-// Select the IP address according to your local network
 IPAddress serverIP(16, 171, 58, 227);
 uint16_t  serverPort = 80;
 
@@ -31,76 +27,97 @@ int status = WL_IDLE_STATUS;
 char ssid[] = "Pieceowater";       
 char pass[] = "Idontwanttosettheworldonfire";    
 
+String eventName;
+DynamicJsonDocument doc(1024);
+
 void socketIOEvent(const socketIOmessageType_t& type, uint8_t * payload, const size_t& length)
 {
   switch (type)
   {
     case sIOtype_DISCONNECT:
       Serial.println("[IOc] Disconnected");
-
       break;
 
     case sIOtype_CONNECT:
       Serial.print("[IOc] Connected to url: ");
       Serial.println((char*) payload);
-
       // join default namespace (no auto join in Socket.IO V3)
       socketIO.send(sIOtype_CONNECT, "/");
-
       break;
 
     case sIOtype_EVENT:
       Serial.print("[IOc] Get event: ");
       Serial.println((char*) payload);
 
+      // Parse the incoming JSON payload to handle specific events
+      deserializeJson(doc, payload, length);
+
+      // Check the event name
+      eventName = doc[0].as<String>(); // Convert ElementProxy to String
+      if (eventName == "ping") {
+        // Handle ping event
+        Serial.println("Received ping event");
+        // Logic for ping event...
+      } else if (eventName == "subscribe") {
+        // Handle subscribe event
+        Serial.println("Received subscribe event");
+
+        // Access additional parameters
+        String deviceId = doc[1]["deviceId"].as<String>(); // Convert ElementProxy to String
+        Serial.print("Device ID: ");
+        Serial.println(deviceId);
+        // Logic for subscribe event...
+      } else if (eventName == "kaspi-pay") {
+        // Handle kaspi-pay event
+        Serial.println("Received kaspi-pay event");
+        // Logic for kaspi-pay event...
+      } else if (eventName == "kaspi-check") {
+        // Handle kaspi-check event
+        Serial.println("Received kaspi-check event");
+        // Logic for kaspi-check event...
+      }
+
       break;
 
     case sIOtype_ACK:
       Serial.print("[IOc] Get ack: ");
       Serial.println(length);
-
       //hexdump(payload, length);
-
       break;
 
     case sIOtype_ERROR:
       Serial.print("[IOc] Get error: ");
       Serial.println(length);
-
       //hexdump(payload, length);
-
       break;
 
     case sIOtype_BINARY_EVENT:
       Serial.print("[IOc] Get binary: ");
       Serial.println(length);
-
       //hexdump(payload, length);
-
       break;
 
     case sIOtype_BINARY_ACK:
       Serial.print("[IOc] Get binary ack: ");
       Serial.println(length);
-
       //hexdump(payload, length);
-
       break;
 
     case sIOtype_PING:
       Serial.println("[IOc] Get PING");
-
+      // Respond to PING if needed...
       break;
 
     case sIOtype_PONG:
       Serial.println("[IOc] Get PONG");
-
+      // Handle PONG if needed...
       break;
 
     default:
       break;
   }
 }
+
 
 void printWifiStatus()
 {
@@ -159,7 +176,7 @@ void setup()
   // setReconnectInterval to 10s, new from v2.5.1 to avoid flooding server. Default is 0.5s
   socketIO.setReconnectInterval(10000);
 
-  socketIO.setExtraHeaders("Authorization: 1234567890");
+  // socketIO.setExtraHeaders("Authorization: 1234567890");
 
   // server address, port and URL
   // void begin(IPAddress host, uint16_t port, String url = "/socket.io/?EIO=4", String protocol = "arduino");
