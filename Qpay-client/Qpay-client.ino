@@ -1,28 +1,24 @@
 #if !defined(ESP32)
-  #error This code is intended to run only on the ESP32 boards ! Please check your Tools->Board setting.
+  #error This code is intended to run only on the ESP32 boards! Please check your Tools->Board setting.
 #endif
 
-#define _WEBSOCKETS_LOGLEVEL_     4
+#define _WEBSOCKETS_LOGLEVEL_ 4
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
-
 #include <ArduinoJson.h>
-
 #include <WebSocketsClient_Generic.h>
 #include <SocketIOclient_Generic.h>
 
-WiFiMulti       WiFiMulti;
-SocketIOclient  socketIO;
+WiFiMulti WiFiMulti;
+SocketIOclient socketIO;
 
 // Select the IP address according to your local network
 IPAddress serverIP(16, 171, 58, 227);
-uint16_t  serverPort = 80;
+uint16_t serverPort = 80;
 
 int status = WL_IDLE_STATUS;
-
-///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 
 char ssid[] = "Pieceowater";       
 char pass[] = "Idontwanttosettheworldonfire";    
@@ -30,119 +26,103 @@ char pass[] = "Idontwanttosettheworldonfire";
 String eventName;
 DynamicJsonDocument doc(1024);
 
-void socketIOEvent(const socketIOmessageType_t& type, uint8_t * payload, const size_t& length)
-{
-  switch (type)
-  {
+// Define pins for coin and bill acceptor
+const int coinAcceptorPin = 34;
+const int billAcceptorPin = 35;
+const int kaspiQrPin = 25;
+const int gsmTxPin = 14;
+const int gsmRxPin = 12;
+
+volatile int coinCount = 0;
+volatile int billCount = 0;
+
+void IRAM_ATTR handleCoinInterrupt() {
+  coinCount++;
+}
+
+void IRAM_ATTR handleBillInterrupt() {
+  billCount++;
+}
+
+void sendKaspiQrSignal(int amount) {
+  for (int i = 0; i < amount / 10; i++) {
+    digitalWrite(kaspiQrPin, HIGH);
+    delay(100);
+    digitalWrite(kaspiQrPin, LOW);
+    delay(100);
+  }
+}
+
+void socketIOEvent(const socketIOmessageType_t& type, uint8_t * payload, const size_t& length) {
+  switch (type) {
     case sIOtype_DISCONNECT:
       Serial.println("[IOc] Disconnected");
       break;
-
     case sIOtype_CONNECT:
       Serial.print("[IOc] Connected to url: ");
       Serial.println((char*) payload);
-      // join default namespace (no auto join in Socket.IO V3)
       socketIO.send(sIOtype_CONNECT, "/");
       break;
-
     case sIOtype_EVENT:
       Serial.print("[IOc] Get event: ");
       Serial.println((char*) payload);
-
-      // Parse the incoming JSON payload to handle specific events
       deserializeJson(doc, payload, length);
-
-      // Check the event name
-      eventName = doc[0].as<String>(); // Convert ElementProxy to String
+      eventName = doc[0].as<String>();
       if (eventName == "ping") {
-        // Handle ping event
         Serial.println("Received ping event");
-        // Logic for ping event...
       } else if (eventName == "subscribe") {
-        // Handle subscribe event
         Serial.println("Received subscribe event");
-
-        // Access additional parameters
-        String deviceId = doc[1]["deviceId"].as<String>(); // Convert ElementProxy to String
+        String deviceId = doc[1]["deviceId"].as<String>();
         Serial.print("Device ID: ");
         Serial.println(deviceId);
-        // Logic for subscribe event...
       } else if (eventName == "kaspi-pay") {
-        // Handle kaspi-pay event
         Serial.println("Received kaspi-pay event");
-        // Logic for kaspi-pay event...
       } else if (eventName == "kaspi-check") {
-        // Handle kaspi-check event
         Serial.println("Received kaspi-check event");
-        // Logic for kaspi-check event...
       }
-
       break;
-
     case sIOtype_ACK:
       Serial.print("[IOc] Get ack: ");
       Serial.println(length);
-      //hexdump(payload, length);
       break;
-
     case sIOtype_ERROR:
       Serial.print("[IOc] Get error: ");
       Serial.println(length);
-      //hexdump(payload, length);
       break;
-
     case sIOtype_BINARY_EVENT:
       Serial.print("[IOc] Get binary: ");
       Serial.println(length);
-      //hexdump(payload, length);
       break;
-
     case sIOtype_BINARY_ACK:
       Serial.print("[IOc] Get binary ack: ");
       Serial.println(length);
-      //hexdump(payload, length);
       break;
-
     case sIOtype_PING:
       Serial.println("[IOc] Get PING");
-      // Respond to PING if needed...
       break;
-
     case sIOtype_PONG:
       Serial.println("[IOc] Get PONG");
-      // Handle PONG if needed...
       break;
-
     default:
       break;
   }
 }
 
-
-void printWifiStatus()
-{
-  // print the SSID of the network you're attached to:
+void printWifiStatus() {
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
-
-  // print your board's IP address:
   IPAddress ip = WiFi.localIP();
   Serial.print("WebSockets Client IP Address: ");
   Serial.println(ip);
-
-  // print the received signal strength:
   long rssi = WiFi.RSSI();
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
   Serial.println(" dBm");
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
-
   while (!Serial);
-
   delay(200);
 
   Serial.print("\nStart ESP32_WebSocketClientSocketIO on ");
@@ -150,75 +130,86 @@ void setup()
   Serial.println(WEBSOCKETS_GENERIC_VERSION);
 
   WiFiMulti.addAP(ssid, pass);
-
   Serial.print("Connecting to ");
   Serial.println(ssid);
-
-  //WiFi.disconnect();
-  while (WiFiMulti.run() != WL_CONNECTED)
-  {
+  while (WiFiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
   }
 
   Serial.println();
-
-  // Client address
   Serial.print("WebSockets Client started @ IP address: ");
   Serial.println(WiFi.localIP());
-
-  // server address, port and URL
   Serial.print("Connecting to WebSockets Server @ IP address: ");
   Serial.print(serverIP);
   Serial.print(", port: ");
   Serial.println(serverPort);
-
-  // setReconnectInterval to 10s, new from v2.5.1 to avoid flooding server. Default is 0.5s
   socketIO.setReconnectInterval(10000);
-
-  // socketIO.setExtraHeaders("Authorization: 1234567890");
-
-  // server address, port and URL
-  // void begin(IPAddress host, uint16_t port, String url = "/socket.io/?EIO=4", String protocol = "arduino");
-  // To use default EIO=4 from v2.5.1
   socketIO.begin(serverIP, serverPort);
-
-  // event handler
   socketIO.onEvent(socketIOEvent);
+
+  // Set up pins and interrupts for coin and bill acceptor
+  pinMode(coinAcceptorPin, INPUT_PULLUP);
+  pinMode(billAcceptorPin, INPUT_PULLUP);
+  pinMode(kaspiQrPin, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(coinAcceptorPin), handleCoinInterrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(billAcceptorPin), handleBillInterrupt, FALLING);
+
+  // Setup UART for GSM module
+  Serial1.begin(9600, SERIAL_8N1, gsmRxPin, gsmTxPin);
 }
 
 unsigned long messageTimestamp = 0;
 
-void loop()
-{
-  socketIO.loop();
+void loop() {
+  // socketIO.loop();
+  // uint64_t now = millis();
 
-  uint64_t now = millis();
+  // if (now - messageTimestamp > 30000) {
+  //   messageTimestamp = now;
 
-  if (now - messageTimestamp > 30000)
-  {
-    messageTimestamp = now;
+  //   DynamicJsonDocument doc(1024);
+  //   JsonArray array = doc.to<JsonArray>();
 
-    // creat JSON message for Socket.IO (event)
+  //   array.add("ping");
+  //   JsonObject param1 = array.createNestedObject();
+  //   param1["now"] = (uint32_t) now;
+  //   String output;
+  //   serializeJson(doc, output);
+  //   socketIO.sendEVENT(output);
+  //   Serial.println(output);
+  // }
+
+  // Send coin and bill count events
+  if (coinCount > 0) {
+    Serial.print("Coins inserted: ");
+    Serial.println(coinCount);
+    sendKaspiQrSignal(coinCount * 10);
+
     DynamicJsonDocument doc(1024);
     JsonArray array = doc.to<JsonArray>();
-
-    // add evnet name
-    // Hint: socket.on('event_name', ....
-    array.add("ping");
-
-    // add payload (parameters) for the event
+    array.add("coin-inserted");
     JsonObject param1 = array.createNestedObject();
-    param1["now"]     = (uint32_t) now;
-
-    // JSON to String (serializion)
+    param1["count"] = coinCount;
     String output;
     serializeJson(doc, output);
-
-    // Send event
     socketIO.sendEVENT(output);
+    coinCount = 0;
+  }
 
-    // Print JSON for debugging
-    Serial.println(output);
+  if (billCount > 0) {
+    Serial.print("Bills inserted: ");
+    Serial.println(billCount);
+    sendKaspiQrSignal(billCount * 100);
+
+    DynamicJsonDocument doc(1024);
+    JsonArray array = doc.to<JsonArray>();
+    array.add("bill-inserted");
+    JsonObject param1 = array.createNestedObject();
+    param1["count"] = billCount;
+    String output;
+    serializeJson(doc, output);
+    socketIO.sendEVENT(output);
+    billCount = 0;
   }
 }
