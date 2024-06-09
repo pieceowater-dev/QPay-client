@@ -4,16 +4,14 @@
 
 #include <Arduino.h>
 
-extern const int kaspiQrPin;
-
-void sendKaspiQrSignal(int amount) {
-  for (int i = 0; i < amount / 10; i++) {
-    digitalWrite(kaspiQrPin, HIGH);
-    delay(100);
-    digitalWrite(kaspiQrPin, LOW);
-    delay(100);
-    Serial.println("!!!!!!!!!!!!!!!!!ONE MORE IMPULSE RELEASED!!!!!!!!!!!!!!!!!");
-  }
+void sendKaspiQrSignal(int amount, int pin) {
+    for (int i = 0; i < amount / 10; i++) {
+        digitalWrite(pin, HIGH);
+        delay(100);
+        digitalWrite(pin, LOW);
+        delay(100);
+        Serial.println("!!!!!!!!!!!!!!!!!ONE MORE IMPULSE RELEASED!!!!!!!!!!!!!!!!!");
+    }
 }
 
 #endif // UTILS_H
