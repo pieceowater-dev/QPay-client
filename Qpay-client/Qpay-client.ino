@@ -1,3 +1,4 @@
+//Qpay-client.ino
 // 1 - connect to wss
 // 2 - auth payload wss with Bearer eyJh...casd123
 // 3 - emit "subscribe"
