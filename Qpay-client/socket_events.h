@@ -29,13 +29,13 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t * payload, const s
       Serial.println("Sent auth payload: " + output);
 
       // Emit subscribe event
-      // DynamicJsonDocument subscribePayload(1024);
-      // JsonArray subscribeArray = subscribePayload.to<JsonArray>();
-      // subscribeArray.add("subscribe");
-      // String subscribeOutput;
-      // serializeJson(subscribePayload, subscribeOutput);
-      // socketIO.sendEVENT(subscribeOutput);
-      // Serial.println("Sent subscribe event: " + subscribeOutput);
+      DynamicJsonDocument subscribePayload(1024);
+      JsonArray subscribeArray = subscribePayload.to<JsonArray>();
+      subscribeArray.add("subscribe");
+      String subscribeOutput;
+      serializeJson(subscribePayload, subscribeOutput);
+      socketIO.sendEVENT(subscribeOutput);
+      Serial.println("Sent subscribe event: " + subscribeOutput);
       }
       break;
     case sIOtype_EVENT:
@@ -77,20 +77,20 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t * payload, const s
       }
       break;
     case sIOtype_ACK:
-      // Serial.print("[IOc] Get ack: ");
-      // Serial.println(length);
+      Serial.print("[IOc] Get ack: ");
+      Serial.println(length);
       break;
     case sIOtype_ERROR:
       Serial.print("[IOc] Get error: ");
       Serial.println((char*) payload);
       break;
     case sIOtype_BINARY_EVENT:
-      // Serial.print("[IOc] Get binary: ");
-      // Serial.println(length);
+      Serial.print("[IOc] Get binary: ");
+      Serial.println(length);
       break;
     case sIOtype_BINARY_ACK:
-      // Serial.print("[IOc] Get binary ack: ");
-      // Serial.println(length);
+      Serial.print("[IOc] Get binary ack: ");
+      Serial.println(length);
       break;
     case sIOtype_PING:
       socketIO.send(sIOtype_PONG, "");

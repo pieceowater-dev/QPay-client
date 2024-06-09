@@ -16,7 +16,7 @@
 #include "socket_events.h"
 #include "utils.h"
 
-#define _WEBSOCKETS_LOGLEVEL_ 3
+#define _WEBSOCKETS_LOGLEVEL_ 4
 
 WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
