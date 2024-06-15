@@ -1,9 +1,12 @@
 //net.h
 #ifndef NET_H
 #define NET_H
+
 #include <Arduino.h>
 
-void connectToWiFi();
+bool attemptWiFiConnection();
 String getWiFiStatus();
+bool attemptGSMConnection();
+String getGSMStatus();
 
 #endif // NET_H

@@ -26,10 +26,14 @@
 void setup() {
   Serial.begin(115200);
   Serial.println("---pieceowater---");
-  connectToWiFi();
-  connectToWebsocket();
+
+  if (!attemptWiFiConnection()) {
+    attemptGSMConnection();
+  }
+
+  // connectToWebsocket(); //todo: uncomment later
 }
 
 void loop() {
-  loopThroughtWebsocket();
+  // loopThroughtWebsocket();
 }

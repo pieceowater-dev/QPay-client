@@ -4,7 +4,12 @@
 
 // WIFI Имя сети и пароль
 const char SSID[] = "Pieceowater";
-const char PASS[] = "Idontwanttosettheworldonfire";
+const char PASS[] = "Idontwanttosettheworldonfire123";
+
+// Mobile network credentials
+const char MOBILE_APN[] = "internet.altel.kz";
+const char MOBILE_USER[] = "";  // Опционально
+const char MOBILE_PASS[] = "";  // Опционально
 
 // Ключ устройства
 const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjksImlhdCI6MTcxNzkyOTMzNCwiZXhwIjoxNzE3OTMyOTM0fQ.pNmXBoXYVESXNckTv5TdbGtjFSxS908T9evzc5yeyzg";

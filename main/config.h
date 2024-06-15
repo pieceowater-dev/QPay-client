@@ -6,18 +6,18 @@
 #include <IPAddress.h>
 #include <cstdint>
 
-// WIFI Имя сети и пароль
 extern const char SSID[];
 extern const char PASS[];
 
-// Ключ устройства
+extern const char MOBILE_APN[];
+extern const char MOBILE_USER[];
+extern const char MOBILE_PASS[];
+
 extern const char* DEVICE_TOKEN;
 
-// Адрес вебсокета
 extern const IPAddress SERVER_IP;
 extern const uint16_t SERVER_PORT;
 
-// Пины
 extern const int COIN_ACCEPTOR_PIN;
 extern const int BILL_ACCEPTOR_PIN;
 extern const int OUTPUT_PIN;
