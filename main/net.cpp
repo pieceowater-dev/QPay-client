@@ -1,4 +1,3 @@
-//net.spp
 #include "net.h"
 #include <WiFi.h>
 
@@ -48,23 +47,39 @@ String getWiFiStatus() {
 
 bool attemptGSMConnection() {
   Serial.println("Initializing GSM...");
+  
+  // Check if the modem is powered and responding
+  Serial.println("Sending AT command to check modem...");
+  if (!modem.testAT()) {
+    Serial.println("Failed to communicate with GSM modem");
+    return false;
+  }
+  
   modem.restart();
-
+  
   if (!modem.waitForNetwork()) {
     Serial.println("GSM network not available");
     return false;
   }
 
+  // Debugging information about APN credentials
+  Serial.print("APN: ");
+  Serial.println(MOBILE_APN);
+  Serial.print("User: ");
+  Serial.println(strlen(MOBILE_USER) > 0 ? MOBILE_USER : "none");
+  Serial.print("Pass: ");
+  Serial.println(strlen(MOBILE_PASS) > 0 ? MOBILE_PASS : "none");
+
+  bool connected;
   if (strlen(MOBILE_USER) > 0 && strlen(MOBILE_PASS) > 0) {
-    if (!modem.gprsConnect(MOBILE_APN, MOBILE_USER, MOBILE_PASS)) {
-      Serial.println("GPRS connection failed");
-      return false;
-    }
+    connected = modem.gprsConnect(MOBILE_APN, MOBILE_USER, MOBILE_PASS);
   } else {
-    if (!modem.gprsConnect(MOBILE_APN)) {
-      Serial.println("GPRS connection failed");
-      return false;
-    }
+    connected = modem.gprsConnect(MOBILE_APN);
+  }
+
+  if (!connected) {
+    Serial.println("GPRS connection failed");
+    return false;
   }
 
   String status = getGSMStatus();

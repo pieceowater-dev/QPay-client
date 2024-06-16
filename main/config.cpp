@@ -4,7 +4,7 @@
 
 // WIFI Имя сети и пароль
 const char SSID[] = "Pieceowater";
-const char PASS[] = "Idontwanttosettheworldonfire123";
+const char PASS[] = "Idontwanttosettheworldonfire";
 
 // Mobile network credentials
 const char MOBILE_APN[] = "internet.altel.kz";
