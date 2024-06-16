@@ -30,7 +30,7 @@ void setup() {
     attemptGSMConnection();
   }
 
-  connectToWebsocket(); // Uncomment
+  connectToWebsocket();
 
   // sendPulses(5);
 }
