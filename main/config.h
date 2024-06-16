@@ -18,6 +18,8 @@ extern const char* DEVICE_TOKEN;
 extern const IPAddress SERVER_IP;
 extern const uint16_t SERVER_PORT;
 
+extern const float SIGNAL_VALUE;
+
 extern const int COIN_ACCEPTOR_PIN;
 extern const int BILL_ACCEPTOR_PIN;
 extern const int OUTPUT_PIN;

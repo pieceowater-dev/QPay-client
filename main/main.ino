@@ -13,27 +13,31 @@
 
 //main.ino
 #if !defined(ESP32)
-  #error This code is intended to run only on the ESP32 boards ! Please check your Tools->Board setting.
+  #error This code is intended to run only on the ESP32 boards! Please check your Tools->Board setting.
 #endif
 
-#define _WEBSOCKETS_LOGLEVEL_     4
+#define _WEBSOCKETS_LOGLEVEL_ 4
 
 #include "socket.h"
 #include "net.h"
 #include "config.h"
-
+#include "acceptors.h"
 
 void setup() {
   Serial.begin(115200);
   Serial.println("---pieceowater---");
 
+  setupAcceptors();
+
   if (!attemptWiFiConnection()) {
     attemptGSMConnection();
   }
 
-  // connectToWebsocket(); //todo: uncomment later
+  // connectToWebsocket(); // Uncomment and implement this function as needed
 }
 
 void loop() {
+  processAcceptors();
   // loopThroughtWebsocket();
 }
+

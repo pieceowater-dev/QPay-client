@@ -18,6 +18,9 @@ const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjk
 const IPAddress SERVER_IP(16, 171, 58, 227);
 const uint16_t SERVER_PORT = 80;
 
+// Стоимость сигнала в локальной валюте
+const float SIGNAL_VALUE = 10.0;  // 1 signal = 10 Tenge
+
 // Пины
 const int COIN_ACCEPTOR_PIN = 34;
 const int BILL_ACCEPTOR_PIN = 35;
