@@ -70,7 +70,7 @@ void processAcceptors() {
   if (billSignalCount != lastBillSignalCount) {
     // Расчет количества новых сигналов и их стоимости
     int billSignals = billSignalCount - lastBillSignalCount;
-    float billValue = billSignals * SIGNAL_VALUE;
+    float billValue = billSignals * BILL_SIGNAL_VALUE;
     // Вывод информации о сигналах от купюроприемника в консоль
     Serial.print("Bill acceptor signals: ");
     Serial.print(billSignals);

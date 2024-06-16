@@ -20,6 +20,7 @@ const uint16_t SERVER_PORT = 80;
 
 // Стоимость сигнала в локальной валюте
 const float SIGNAL_VALUE = 10.0;  // 1 signal = 10 Tenge
+const float BILL_SIGNAL_VALUE = 100.0;  // 1 signal = 100 Tenge
 
 // Пины
 const int COIN_ACCEPTOR_PIN = 34;

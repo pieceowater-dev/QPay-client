@@ -22,6 +22,7 @@
 #include "net.h"
 #include "config.h"
 #include "acceptors.h"
+#include "output.h"
 
 void setup() {
   Serial.begin(115200);
@@ -33,11 +34,13 @@ void setup() {
     attemptGSMConnection();
   }
 
-  // connectToWebsocket(); // Uncomment and implement this function as needed
+  connectToWebsocket(); // Uncomment
+
+  // sendPulses(5);
 }
 
 void loop() {
   processAcceptors();
-  // loopThroughtWebsocket();
+  loopThroughtWebsocket();
 }
 
