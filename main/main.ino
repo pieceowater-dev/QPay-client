@@ -1,7 +1,3 @@
-// example: 
-//    https://github.com/pieceowater-dev/QPay-client/blob/7e259b440088b357870fe77074eb8b760be79439/Qpay-client/Qpay-client.ino
-//    https://github.com/pieceowater-dev/QPay-client/blob/e29e2e27573446343e93ddf16079d9ea9e5450fa/Qpay-client/Qpay-client.ino
-//
 // workflow:
 // 1 - connect to wss / gsm
 // 2 - auth payload wss with Bearer eyJh...casd123
@@ -34,7 +30,7 @@ void setup() {
     attemptGSMConnection();
   }
 
-  connectToWebsocket(); // Uncomment
+  connectToWebsocket();
 
   // sendPulses(5);
 }

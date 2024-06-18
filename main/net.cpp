@@ -1,3 +1,5 @@
+//net.cpp
+//gsm model SIMKOM A7670E
 #include "net.h"
 #include <WiFi.h>
 
