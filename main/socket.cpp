@@ -19,11 +19,11 @@ void connectToWebsocket() {
 
   socketIO.setReconnectInterval(10000);
 
-  // String authorizationHeader = "Authorization: Bearer "; //something wrong here
-  // authorizationHeader += DEVICE_TOKEN;
-  // socketIO.setExtraHeaders(authorizationHeader.c_str());
+  String authorizationHeader = "Authorization: Bearer ";
+  authorizationHeader += DEVICE_TOKEN;
+  socketIO.setExtraHeaders(authorizationHeader.c_str());
 
-  socketIO.begin(SERVER_IP, SERVER_PORT);
+  socketIO.begin(SERVER_IP, SERVER_PORT, "/socket.io/?EIO=4&transport=websocket");
 
   socketIO.onEvent([](socketIOmessageType_t type, uint8_t* payload, size_t length) {
     switch (type) {
@@ -36,7 +36,7 @@ void connectToWebsocket() {
         Serial.println((char*)payload);
 
         // join default namespace (no auto join in Socket.IO V3)
-        socketIO.send(sIOtype_CONNECT, "/");
+        socketIO.send(sIOtype_CONNECT, "40");
         break;
 
       case sIOtype_EVENT:
