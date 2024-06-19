@@ -23,20 +23,21 @@ void connectToWebsocket() {
   authorizationHeader += DEVICE_TOKEN;
   socketIO.setExtraHeaders(authorizationHeader.c_str());
 
-  socketIO.begin(SERVER_IP, SERVER_PORT, "/socket.io/?EIO=4&transport=websocket");
+  socketIO.begin(SERVER_IP, SERVER_PORT);
 
   socketIO.onEvent([](socketIOmessageType_t type, uint8_t* payload, size_t length) {
     switch (type) {
       case sIOtype_DISCONNECT:
         Serial.println("[IOc] Disconnected");
         break;
-
       case sIOtype_CONNECT:
         Serial.print("[IOc] Connected to url: ");
         Serial.println((char*)payload);
 
         // join default namespace (no auto join in Socket.IO V3)
         socketIO.send(sIOtype_CONNECT, "40");
+        //sleep(3);
+        //socketIO.send(sIOtype_CONNECT, "42[\"subscribe\"]");
         break;
 
       case sIOtype_EVENT:
@@ -80,6 +81,7 @@ void connectToWebsocket() {
         break;
     }
   });
+
 }
 
 void loopThroughtWebsocket() {
