@@ -36,6 +36,8 @@ void connectToWebsocket() {
 
         // join default namespace (no auto join in Socket.IO V3)
         socketIO.send(sIOtype_CONNECT, "40");
+        socketIO.send(sIOtype_EVENT, "42[\"subscribe\"]");
+        // subscribe
         //sleep(3);
         //socketIO.send(sIOtype_CONNECT, "42[\"subscribe\"]");
         break;
