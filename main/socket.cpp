@@ -10,6 +10,60 @@ SocketIOclient socketIO;
 
 unsigned long messageTimestamp = 0;
 
+
+void handleKaspiCheck(JsonObject& eventData, uint8_t* payload) {
+  // Handle kaspi-check event
+  socketIO.send(sIOtype_EVENT, payload);
+  Serial.println("Handling kaspi-check event");
+  // Add your specific handling code here
+}
+
+void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
+  // Handle kaspi-pay event
+  Serial.println("Handling kaspi-pay event");
+  // Add your specific handling code here
+}
+
+void handleSocketEvent(uint8_t* payload, size_t length) {
+  Serial.print("[IOc] Handing event: ");
+  Serial.println((char*)payload);
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, payload, length);
+
+  if (error) {
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.c_str());
+    return;
+  }
+
+  if (!doc.is<JsonArray>()) {
+    Serial.println("Expected JSON array");
+    return;
+  }
+
+  JsonArray array = doc.as<JsonArray>();
+  if (array.size() < 2) {
+    Serial.println("Invalid event format");
+    return;
+  }
+
+  String eventName = array[0].as<String>();
+  JsonObject eventData = array[1].as<JsonObject>();
+
+  if (eventName == "kaspi-check") {
+    handleKaspiCheck(eventData, payload);
+  } else if (eventName == "kaspi-pay") {
+    handleKaspiPay(eventData, payload);
+  } else if (eventName == "subscribe") {
+     Serial.println("Subscribed!");
+  } else if (eventName == "ping") {
+     Serial.println("I said ping, server said pong!");
+  } else {
+    Serial.print("Unknown event: ");
+    Serial.println(eventName);
+  }
+}
+
 void connectToWebsocket() {
   Serial.println("WebSockets Client started");
   Serial.print("Connecting to: ");
@@ -37,14 +91,9 @@ void connectToWebsocket() {
         // join default namespace (no auto join in Socket.IO V3)
         socketIO.send(sIOtype_CONNECT, "40");
         socketIO.send(sIOtype_EVENT, "42[\"subscribe\"]");
-        // subscribe
-        //sleep(3);
-        //socketIO.send(sIOtype_CONNECT, "42[\"subscribe\"]");
         break;
-
       case sIOtype_EVENT:
-        Serial.print("[IOc] Got event: ");
-        Serial.println((char*)payload);
+        handleSocketEvent(payload, length);
         break;
 
       case sIOtype_ACK:
@@ -83,7 +132,6 @@ void connectToWebsocket() {
         break;
     }
   });
-
 }
 
 void loopThroughtWebsocket() {
