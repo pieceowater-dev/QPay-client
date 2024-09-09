@@ -15,13 +15,12 @@ void handleKaspiCheck(JsonObject& eventData, uint8_t* payload) {
   // Handle kaspi-check event
   socketIO.send(sIOtype_EVENT, payload);
   Serial.println("Handling kaspi-check event");
-  // Add your specific handling code here
 }
 
 void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
   // Handle kaspi-pay event
   Serial.println("Handling kaspi-pay event");
-  // Add your specific handling code here
+  sendPulses()
 }
 
 void handleSocketEvent(uint8_t* payload, size_t length) {

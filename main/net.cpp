@@ -4,7 +4,8 @@
 #include <WiFi.h>
 
 // Define the GSM modem model (example: SIM800)
-#define TINY_GSM_MODEM_SIM800
+//TINY_GSM_MODEM_SIM800
+#define TINY_GSM_MODEM_SIM7000SSL 
 
 // Include TinyGsmClient after defining the modem model
 #include <TinyGsmClient.h>

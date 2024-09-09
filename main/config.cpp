@@ -7,12 +7,12 @@ const char SSID[] = "Pieceowater";
 const char PASS[] = "Idontwanttosettheworldonfire";
 
 // Mobile network credentials
-const char MOBILE_APN[] = "internet.altel.kz";
+const char MOBILE_APN[] = "internet.beeline.kz"; // "internet"
 const char MOBILE_USER[] = "";  // Опционально
 const char MOBILE_PASS[] = "";  // Опционально
 
 // Ключ устройства
-const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjksImlhdCI6MTcxNzkyOTMzNCwiZXhwIjoxNzE3OTMyOTM0fQ.pNmXBoXYVESXNckTv5TdbGtjFSxS908T9evzc5yeyzg";
+const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjUsImlhdCI6MTcyMDYzMTI4MSwiZXhwIjoxNzIwNjM0ODgxfQ.V-NbJsh_1rkdtRI24QugfSCHaLYyUuZN0bCdKu2Pn9Q";
 
 // Адрес вебсокета
 const IPAddress SERVER_IP(16, 171, 58, 227);

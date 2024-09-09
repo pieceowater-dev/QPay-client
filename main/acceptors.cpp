@@ -64,6 +64,7 @@ void processAcceptors() {
     // Вывод общего количества сигналов от монетоприемника
     Serial.print("Total coins sig count = ");
     Serial.println(lastCoinSignalCount);
+    sendPulses(lastCoinSignalCount)
   }
 
   // Проверка, изменилось ли количество сигналов от купюроприемника
@@ -82,5 +83,6 @@ void processAcceptors() {
     // Вывод общего количества сигналов от купюроприемника
     Serial.print("Total bills sig count = ");
     Serial.println(lastBillSignalCount);
+    sendPulses(lastBillSignalCount)
   }
 }
