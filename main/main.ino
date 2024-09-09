@@ -1,3 +1,12 @@
+// рабочий процесс:
+// 1 - подключение к wss / gsm
+// 2 - авторизация через wss с использованием Bearer токена: Bearer eyJh...casd123
+// 3 - отправить "subscribe" (emit)
+// 4 - слушать события "subscribe", "kaspi-pay", "kaspi-check"
+// 5 - если получено "kaspi-check", отправить (emit) обратно txn_id на "kaspi-check"
+// 6 - если получено "kaspi-pay", пустить N*100 импульсов, отправить (emit) txn_id на "kaspi-pay"
+// 7 - если оплата наличными, пустить N*100 импульсов, отправить (emit) "cash-payment" ({sum: "N"})
+
 // workflow:
 // 1 - connect to wss / gsm
 // 2 - auth payload wss with Bearer eyJh...casd123
