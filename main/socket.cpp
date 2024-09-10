@@ -22,13 +22,17 @@ void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
   // Handle kaspi-pay event
   Serial.println("Handling kaspi-pay event");
 
-  // Extracting the pulse count (N) from the eventData object
-  int pulseCount = eventData["pulseCount"] | 0;  // Adjust this key if the actual key is different
-  String txn_id = eventData["txn_id"] | "";      // Extracting txn_id from the eventData object
+  // Extract the pulse count (N) from the eventData object
+  // Check if "sum" is a string and convert it to an integer
+  String sumString = eventData["sum"] | "0";  // Extract sum as a string
+  int sum = sumString.toInt();  // Convert sum from string to integer
+
+  int pulseCount = sum / 100;  // Divide sum by 100 to get pulseCount
+  String txn_id = eventData["txn_id"] | "";  // Extract txn_id from the eventData object
 
   if (pulseCount > 0) {
-    // Call sendPulses with N * 100
-    int totalPulses = pulseCount * 100;
+    // Call sendPulses
+    int totalPulses = pulseCount;
     sendPulses(totalPulses);
     Serial.print("Sent ");
     Serial.print(totalPulses);
@@ -48,7 +52,8 @@ void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
     serializeJson(doc, output);
 
     // Send the event with txn_id back to the server
-    socketIO.sendEVENT(output);
+    // socketIO.sendEVENT(output);
+    socketIO.send(sIOtype_EVENT, payload);
     Serial.print("Acknowledgment sent for txn_id: ");
     Serial.println(txn_id);
   } else {

@@ -12,7 +12,7 @@ const char MOBILE_USER[] = "";  // Опционально
 const char MOBILE_PASS[] = "";  // Опционально
 
 // Ключ устройства
-const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjUsImlhdCI6MTcyMDYzMTI4MSwiZXhwIjoxNzIwNjM0ODgxfQ.V-NbJsh_1rkdtRI24QugfSCHaLYyUuZN0bCdKu2Pn9Q";
+const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjUsImlhdCI6MTcyNTk4NzMxMywiZXhwIjoxNzI1OTkwOTEzfQ.5ZlxlGIp7BQ-AB6ct_p2aKeT2E7DeRpZ6MidQtC3n50";
 
 // Адрес вебсокета
 const IPAddress SERVER_IP(16, 171, 58, 227);
