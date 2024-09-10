@@ -12,6 +12,28 @@ SocketIOclient socketIO;
 unsigned long messageTimestamp = 0;
 
 
+void emitCashPaymentEvent(int sum) {
+  // Create a JSON object
+  DynamicJsonDocument doc(1024);
+  JsonObject eventData = doc.to<JsonObject>();
+  
+  // Add sum as a string to the JSON object
+  eventData["sum"] = String(sum);
+
+  // Convert the JSON object to a string
+  String output;
+  serializeJson(doc, output);
+
+  // Create the event message in the required SocketIO format
+  String message = "42[\"cash-payment\"," + output + "]";
+
+  // Emit the event
+  socketIO.send(sIOtype_EVENT, message.c_str());
+
+  // Debug: Print the event that is sent
+  Serial.println("Emitting cash-payment event: " + message);
+}
+
 void handleKaspiCheck(JsonObject& eventData, uint8_t* payload) {
   // Handle kaspi-check event
   socketIO.send(sIOtype_EVENT, payload);
@@ -27,7 +49,7 @@ void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
   String sumString = eventData["sum"] | "0";  // Extract sum as a string
   int sum = sumString.toInt();  // Convert sum from string to integer
 
-  int pulseCount = sum / 100;  // Divide sum by 100 to get pulseCount
+  int pulseCount = sum / 10;  // Divide sum by 100 to get pulseCount
   String txn_id = eventData["txn_id"] | "";  // Extract txn_id from the eventData object
 
   if (pulseCount > 0) {

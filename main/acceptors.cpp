@@ -1,5 +1,6 @@
 #include "acceptors.h"
 #include "output.h"
+#include "socket.h"
 
 // Переменные для отслеживания количества сигналов от монетоприемника и купюроприемника
 volatile int coinSignalCount = 0;
@@ -61,7 +62,8 @@ void processAcceptors() {
     lastCoinSignalCount = coinSignalCount;
     Serial.print("Total coins sig count = ");
     Serial.println(lastCoinSignalCount);
-    sendPulses(lastCoinSignalCount);  // Add a semicolon here
+    sendPulses(lastCoinSignalCount);
+    emitCashPaymentEvent(coinValue);
   }
 
   if (billSignalCount != lastBillSignalCount) {
@@ -75,6 +77,7 @@ void processAcceptors() {
       lastBillSignalCount = billSignalCount;
       Serial.print("Total bills sig count = ");
       Serial.println(lastBillSignalCount);
-      sendPulses(lastBillSignalCount);  // Add a semicolon here
+      sendPulses(lastBillSignalCount); 
+      emitCashPaymentEvent(billValue); 
   }
 }
