@@ -1,4 +1,5 @@
 #include "acceptors.h"
+#include "output.h"
 
 // Переменные для отслеживания количества сигналов от монетоприемника и купюроприемника
 volatile int coinSignalCount = 0;
@@ -50,39 +51,30 @@ void processAcceptors() {
 
   // Проверка, изменилось ли количество сигналов от монетоприемника
   if (coinSignalCount != lastCoinSignalCount) {
-    // Расчет количества новых сигналов и их стоимости
     int coinSignals = coinSignalCount - lastCoinSignalCount;
     float coinValue = coinSignals * SIGNAL_VALUE;
-    // Вывод информации о сигналах от монетоприемника в консоль
     Serial.print("Coin acceptor signals: ");
     Serial.print(coinSignals);
     Serial.print(" -> Value: ");
     Serial.print(coinValue);
     Serial.println(" Tenge");
-    // Обновление предыдущего значения счетчика сигналов от монетоприемника
     lastCoinSignalCount = coinSignalCount;
-    // Вывод общего количества сигналов от монетоприемника
     Serial.print("Total coins sig count = ");
     Serial.println(lastCoinSignalCount);
-    sendPulses(lastCoinSignalCount)
+    sendPulses(lastCoinSignalCount);  // Add a semicolon here
   }
 
-  // Проверка, изменилось ли количество сигналов от купюроприемника
   if (billSignalCount != lastBillSignalCount) {
-    // Расчет количества новых сигналов и их стоимости
-    int billSignals = billSignalCount - lastBillSignalCount;
-    float billValue = billSignals * BILL_SIGNAL_VALUE;
-    // Вывод информации о сигналах от купюроприемника в консоль
-    Serial.print("Bill acceptor signals: ");
-    Serial.print(billSignals);
-    Serial.print(" -> Value: ");
-    Serial.print(billValue);
-    Serial.println(" Tenge");
-    // Обновление предыдущего значения счетчика сигналов от купюроприемника
-    lastBillSignalCount = billSignalCount;
-    // Вывод общего количества сигналов от купюроприемника
-    Serial.print("Total bills sig count = ");
-    Serial.println(lastBillSignalCount);
-    sendPulses(lastBillSignalCount)
+      int billSignals = billSignalCount - lastBillSignalCount;
+      float billValue = billSignals * BILL_SIGNAL_VALUE;
+      Serial.print("Bill acceptor signals: ");
+      Serial.print(billSignals);
+      Serial.print(" -> Value: ");
+      Serial.print(billValue);
+      Serial.println(" Tenge");
+      lastBillSignalCount = billSignalCount;
+      Serial.print("Total bills sig count = ");
+      Serial.println(lastBillSignalCount);
+      sendPulses(lastBillSignalCount);  // Add a semicolon here
   }
 }

@@ -1,6 +1,7 @@
 //socket.cpp
 #include "socket.h"
 #include "config.h"
+#include "output.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <WebSocketsClient_Generic.h>
@@ -20,7 +21,39 @@ void handleKaspiCheck(JsonObject& eventData, uint8_t* payload) {
 void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
   // Handle kaspi-pay event
   Serial.println("Handling kaspi-pay event");
-  sendPulses()
+
+  // Extracting the pulse count (N) from the eventData object
+  int pulseCount = eventData["pulseCount"] | 0;  // Adjust this key if the actual key is different
+  String txn_id = eventData["txn_id"] | "";      // Extracting txn_id from the eventData object
+
+  if (pulseCount > 0) {
+    // Call sendPulses with N * 100
+    int totalPulses = pulseCount * 100;
+    sendPulses(totalPulses);
+    Serial.print("Sent ");
+    Serial.print(totalPulses);
+    Serial.println(" pulses.");
+
+    // Emit txn_id back to the server in a "kaspi-pay" event acknowledgment
+    DynamicJsonDocument doc(256);
+    JsonArray array = doc.to<JsonArray>();
+
+    // Add the event name and payload to the JSON array
+    array.add("kaspi-pay");
+    JsonObject payloadObj = array.createNestedObject();
+    payloadObj["txn_id"] = txn_id;
+
+    // Serialize the JSON array to a string
+    String output;
+    serializeJson(doc, output);
+
+    // Send the event with txn_id back to the server
+    socketIO.sendEVENT(output);
+    Serial.print("Acknowledgment sent for txn_id: ");
+    Serial.println(txn_id);
+  } else {
+    Serial.println("Invalid pulse count, skipping pulse send.");
+  }
 }
 
 void handleSocketEvent(uint8_t* payload, size_t length) {
