@@ -62,7 +62,7 @@ void processAcceptors() {
     lastCoinSignalCount = coinSignalCount;
     Serial.print("Total coins sig count = ");
     Serial.println(lastCoinSignalCount);
-    sendPulses(lastCoinSignalCount);
+    // sendPulses(lastCoinSignalCount);
     emitCashPaymentEvent(coinValue);
   }
 
@@ -77,7 +77,7 @@ void processAcceptors() {
       lastBillSignalCount = billSignalCount;
       Serial.print("Total bills sig count = ");
       Serial.println(lastBillSignalCount);
-      sendPulses(lastBillSignalCount); 
+      // sendPulses(lastBillSignalCount); 
       emitCashPaymentEvent(billValue); 
   }
 }
