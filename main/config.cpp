@@ -7,18 +7,19 @@ const char SSID[] = "Pieceowater";
 const char PASS[] = "Idontwanttosettheworldonfire";
 
 // Mobile network credentials
-const char MOBILE_APN[] = "internet.beeline.kz"; // "internet"
+const char MOBILE_APN[] = "internet";
 const char MOBILE_USER[] = "";  // Опционально
 const char MOBILE_PASS[] = "";  // Опционально
 
 // Ключ устройства
-const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjUsImlhdCI6MTcyNTk4NzMxMywiZXhwIjoxNzI1OTkwOTEzfQ.5ZlxlGIp7BQ-AB6ct_p2aKeT2E7DeRpZ6MidQtC3n50";
+const char* DEVICE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwb3N0SWQiOjIsImlhdCI6MTcyNzYwMDQ5NywiZXhwIjoxNzI3NjA0MDk3fQ.2-5yy_7AV-9JqkSNT10xGE0hGuLymjwwUYQbjKicBbw";
 
-// Адрес вебсокета
-const IPAddress SERVER_IP(16, 171, 58, 227);
+// Адрес вебсокета 51.20.217.61
+const IPAddress SERVER_IP(51, 20, 217, 61);
 const uint16_t SERVER_PORT = 80;
 
 // Стоимость сигнала в локальной валюте
+const float KASPI_SIGNAL_VALUE = 10.0;  // 10 signal = 100 Tenge
 const float SIGNAL_VALUE = 10.0;  // 1 signal = 10 Tenge
 const float BILL_SIGNAL_VALUE = 100.0;  // 1 signal = 100 Tenge
 

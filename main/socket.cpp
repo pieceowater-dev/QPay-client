@@ -49,7 +49,7 @@ void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
   String sumString = eventData["sum"] | "0";  // Extract sum as a string
   int sum = sumString.toInt();  // Convert sum from string to integer
 
-  int pulseCount = sum / 10;  // Divide sum by 100 to get pulseCount
+  int pulseCount = sum / KASPI_SIGNAL_VALUE;  // Divide sum by 100 to get pulseCount
   String txn_id = eventData["txn_id"] | "";  // Extract txn_id from the eventData object
 
   if (pulseCount > 0) {

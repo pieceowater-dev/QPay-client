@@ -18,6 +18,7 @@ extern const char* DEVICE_TOKEN;
 extern const IPAddress SERVER_IP;
 extern const uint16_t SERVER_PORT;
 
+extern const float KASPI_SIGNAL_VALUE;
 extern const float SIGNAL_VALUE;
 extern const float BILL_SIGNAL_VALUE;
 
