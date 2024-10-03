@@ -30,6 +30,7 @@
 #include "output.h"
 
 void setup() {
+  pinMode(OUTPUT_PIN, OUTPUT);
   Serial.begin(115200);
   Serial.println("---pieceowater---");
 
@@ -41,7 +42,7 @@ void setup() {
 
   connectToWebsocket();
 
-  // sendPulses(5);
+  sendPulses(5);
 }
 
 void loop() {
