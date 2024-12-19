@@ -10,8 +10,8 @@ void setupOutput() {
 
 // Функция для генерации импульсов на выводе
 void sendPulses(int pulseCount) {
-    const int pulseDuration = 100; // Длительность импульса в миллисекундах
-    const int pauseDuration = 100; // Длительность паузы между импульсами в миллисекундах
+    const int pulseDuration = 50; // Длительность импульса в миллисекундах
+    const int pauseDuration = 50; // Длительность паузы между импульсами в миллисекундах
 
     for (int i = 0; i < pulseCount; ++i) {
         digitalWrite(OUTPUT_PIN, HIGH);
