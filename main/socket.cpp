@@ -8,13 +8,13 @@
 #include <SocketIOclient_Generic.h>
 
 SocketIOclient socketIO;
-
 unsigned long messageTimestamp = 0;
 
+#define MAX_JSON_DOC_SIZE 2048
 
 void emitCashPaymentEvent(int sum) {
   // Create a JSON object
-  DynamicJsonDocument doc(1024);
+  DynamicJsonDocument doc(MAX_JSON_DOC_SIZE);
   JsonObject eventData = doc.to<JsonObject>();
   
   // Add sum as a string to the JSON object
@@ -41,46 +41,30 @@ void handleKaspiCheck(JsonObject& eventData, uint8_t* payload) {
 }
 
 void handleKaspiPay(JsonObject& eventData, uint8_t* payload) {
-  // Handle kaspi-pay event
-  Serial.println("Handling kaspi-pay event");
+    Serial.println("Handling kaspi-pay event");
 
-  // Extract the pulse count (N) from the eventData object
-  // Check if "sum" is a string and convert it to an integer
-  String sumString = eventData["sum"] | "0";  // Extract sum as a string
-  int sum = sumString.toInt();  // Convert sum from string to integer
+    String sumString = eventData["sum"] | "0";
+    int sum = sumString.toInt();
+    int pulseCount = sum / KASPI_SIGNAL_VALUE;
+    String txn_id = eventData["txn_id"] | "";
 
-  int pulseCount = sum / KASPI_SIGNAL_VALUE;  // Divide sum by 100 to get pulseCount
-  String txn_id = eventData["txn_id"] | "";  // Extract txn_id from the eventData object
+    if (pulseCount > 0) {
+        sendPulses(pulseCount);
+        Serial.printf("Sent %d pulses.\n", pulseCount);
 
-  if (pulseCount > 0) {
-    // Call sendPulses
-    int totalPulses = pulseCount;
-    sendPulses(totalPulses);
-    Serial.print("Sent ");
-    Serial.print(totalPulses);
-    Serial.println(" pulses.");
+        DynamicJsonDocument doc(MAX_JSON_DOC_SIZE);
+        JsonArray array = doc.to<JsonArray>();
+        array.add("kaspi-pay");
+        JsonObject payloadObj = array.createNestedObject();
+        payloadObj["txn_id"] = txn_id;
 
-    // Emit txn_id back to the server in a "kaspi-pay" event acknowledgment
-    DynamicJsonDocument doc(256);
-    JsonArray array = doc.to<JsonArray>();
-
-    // Add the event name and payload to the JSON array
-    array.add("kaspi-pay");
-    JsonObject payloadObj = array.createNestedObject();
-    payloadObj["txn_id"] = txn_id;
-
-    // Serialize the JSON array to a string
-    String output;
-    serializeJson(doc, output);
-
-    // Send the event with txn_id back to the server
-    // socketIO.sendEVENT(output);
-    socketIO.send(sIOtype_EVENT, payload);
-    Serial.print("Acknowledgment sent for txn_id: ");
-    Serial.println(txn_id);
-  } else {
-    Serial.println("Invalid pulse count, skipping pulse send.");
-  }
+        String output;
+        serializeJson(doc, output);
+        socketIO.send(sIOtype_EVENT, payload);
+        Serial.printf("Acknowledgment sent for txn_id: %s\n", txn_id.c_str());
+    } else {
+        Serial.println("Invalid pulse count, skipping pulse send.");
+    }
 }
 
 void handleSocketEvent(uint8_t* payload, size_t length) {
